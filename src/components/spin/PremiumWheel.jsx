@@ -57,7 +57,7 @@ export default function PremiumWheel({ segments, onFinished, isSpinning, onReady
       },
       lineWidth:       2,
       strokeStyle:     'rgba(0,255,127,0.35)',
-      textOrientation: 'vertical',
+      textOrientation: 'horizontal',
       textAlignment:   'center',
     })
 
