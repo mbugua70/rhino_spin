@@ -13,22 +13,16 @@ function formatDate(dateStr) {
   }
 }
 
-function SnapshotRows({ snapshot }) {
-  if (!snapshot || typeof snapshot !== 'object') return null
-  const entries = Object.entries(snapshot).filter(
+function getSnapshotEntries(snapshot) {
+  if (!snapshot || typeof snapshot !== 'object') return []
+  return Object.entries(snapshot).filter(
     ([, v]) => v !== null && v !== undefined && typeof v !== 'object' && typeof v !== 'boolean'
   )
-  if (!entries.length) return null
-  return entries.map(([key, value]) => (
-    <div key={key} className="prize-snapshot-row">
-      <span className="prize-snapshot-key">{key.replace(/_/g, ' ')}</span>
-      <span className="prize-snapshot-val">{String(value)}</span>
-    </div>
-  ))
 }
 
 export default function PrizeResultModal({ spin, justWon = false }) {
   const { player_name, prize_name, spun_at, prize_snapshot } = spin
+  const snapshotEntries = getSnapshotEntries(prize_snapshot)
 
   return (
     <motion.div
@@ -59,7 +53,7 @@ export default function PrizeResultModal({ spin, justWon = false }) {
         {justWon ? 'YOU WON!' : 'YOUR PRIZE'}
       </motion.h2>
 
-      {/* Prize name — the centrepiece */}
+      {/* Prize name — centrepiece */}
       <motion.div
         className="prize-name"
         initial={{ opacity: 0, scale: 0.88 }}
@@ -90,8 +84,8 @@ export default function PrizeResultModal({ spin, justWon = false }) {
         )}
       </motion.div>
 
-      {/* Prize snapshot details */}
-      {prize_snapshot && <SnapshotRows snapshot={prize_snapshot} /> && (
+      {/* Prize snapshot — only rendered when there are valid flat entries */}
+      {snapshotEntries.length > 0 && (
         <motion.div
           className="prize-snapshot"
           initial={{ opacity: 0 }}
@@ -102,7 +96,12 @@ export default function PrizeResultModal({ spin, justWon = false }) {
             <Gift size={13} />
             Prize Details
           </div>
-          <SnapshotRows snapshot={prize_snapshot} />
+          {snapshotEntries.map(([key, value]) => (
+            <div key={key} className="prize-snapshot-row">
+              <span className="prize-snapshot-key">{key.replace(/_/g, ' ')}</span>
+              <span className="prize-snapshot-val">{String(value)}</span>
+            </div>
+          ))}
         </motion.div>
       )}
 

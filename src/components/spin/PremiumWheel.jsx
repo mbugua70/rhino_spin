@@ -1,4 +1,9 @@
 import { useEffect, useRef } from 'react'
+import gsap from 'gsap'
+
+// Winwheel.js (loaded via public/Winwheel.js) calls window.TweenMax internally.
+// GSAP 3 is API-compatible with TweenMax for the subset Winwheel uses.
+if (typeof window !== 'undefined') window.TweenMax = gsap
 
 const FALLBACK_COLORS = [
   '#00A651', '#007A3D', '#00C060', '#005c2e',
@@ -7,16 +12,16 @@ const FALLBACK_COLORS = [
 ]
 
 export default function PremiumWheel({ segments, onFinished, isSpinning, onReady }) {
-  const wheelRef     = useRef(null)
+  const wheelRef      = useRef(null)
   const onFinishedRef = useRef(onFinished)
 
-  // Keep callback ref current without recreating the wheel
+  // Keep the callback current without recreating the wheel
   useEffect(() => { onFinishedRef.current = onFinished }, [onFinished])
 
   useEffect(() => {
     if (!segments?.length) return
     if (!window.Winwheel) {
-      console.error('Winwheel.js not loaded — check CDN scripts in index.html')
+      console.error('Winwheel not found on window — check public/Winwheel.js is loading')
       return
     }
 
@@ -26,7 +31,7 @@ export default function PremiumWheel({ segments, onFinished, isSpinning, onReady
       wheelRef.current = null
     }
 
-    const fontSize = Math.max(9, Math.min(14, Math.floor(190 / segments.length)))
+    const fontSize = Math.max(13, Math.min(22, Math.floor(280 / segments.length)))
 
     const winSegs = segments.map((s, i) => ({
       fillStyle:     s.fillStyle     || FALLBACK_COLORS[i % FALLBACK_COLORS.length],
@@ -46,16 +51,14 @@ export default function PremiumWheel({ segments, onFinished, isSpinning, onReady
         duration:         6,
         spins:            8,
         easing:           'Power4.easeOut',
-        // Use a ref so stale-closure is never an issue
         callbackFinished: () => onFinishedRef.current?.(),
       },
       lineWidth:       2,
       strokeStyle:     'rgba(0,255,127,0.35)',
       textOrientation: 'curved',
-      responsive:      true,
     })
 
-    // Expose spin function to parent without forwardRef
+    // Hand a spin function to the parent — avoids forwardRef complexity
     onReady?.((winnerIndex1Based) => {
       if (!wheelRef.current) return
       const stopAt = wheelRef.current.getRandomForSegment(winnerIndex1Based)
@@ -73,11 +76,7 @@ export default function PremiumWheel({ segments, onFinished, isSpinning, onReady
 
   return (
     <div className="wheel-wrap">
-      {/* Glow rings behind canvas */}
-      <div className={`wheel-glow-ring wheel-glow-ring--outer${isSpinning ? ' wheel-glow-ring--active' : ''}`} />
-      <div className={`wheel-glow-ring wheel-glow-ring--inner${isSpinning ? ' wheel-glow-ring--active' : ''}`} />
-
-      {/* Pointer */}
+      {/* Pointer sits above the canvas; negative margin pulls canvas up under the tip */}
       <img
         src="/basic_pointer.png"
         className="wheel-pointer"
@@ -85,8 +84,12 @@ export default function PremiumWheel({ segments, onFinished, isSpinning, onReady
         draggable={false}
       />
 
-      {/* Winwheel canvas */}
-      <canvas id="spin-canvas" width={500} height={500} className="wheel-canvas" />
+      {/* Canvas container — glow rings are absolutely positioned inside here */}
+      <div className="wheel-canvas-container">
+        <div className={`wheel-glow-ring wheel-glow-ring--outer${isSpinning ? ' wheel-glow-ring--active' : ''}`} />
+        <div className={`wheel-glow-ring wheel-glow-ring--inner${isSpinning ? ' wheel-glow-ring--active' : ''}`} />
+        <canvas id="spin-canvas" width={500} height={500} className="wheel-canvas" />
+      </div>
     </div>
   )
 }

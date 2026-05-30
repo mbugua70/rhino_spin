@@ -18,4 +18,8 @@ export const submitSpinResult = (player_code, segment_id) =>
 export const getSpinResult = (player_code) =>
   api.get(`/api/spin/player/${player_code}/result`)
 
+// Always-live segment list — no auth required, fetched fresh on every wheel load
+export const getPublicSegments = () =>
+  api.get('/api/spin/segments/public')
+
 export default api

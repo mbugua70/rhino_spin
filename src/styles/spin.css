@@ -437,35 +437,50 @@
 }
 
 /* ---- PremiumWheel wrapper ---- */
+/* Outer wrapper — position:relative so pointer can be absolute */
 .wheel-wrap {
   position: relative;
-  display: inline-flex;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  /* top padding reserves space for the pointer that sits above the canvas */
-  padding-top: 44px;
   width: 100%;
   max-width: 540px;
+  padding-top: 36px; /* space for pointer that sits above the canvas */
 }
 
-/* Canvas — responsive, square */
-.wheel-canvas {
+/* Pointer — absolutely pinned to top-centre of wrap, tip points into wheel */
+.wheel-pointer {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 52px;
+  height: auto;
+  z-index: 10;
+  filter: drop-shadow(0 3px 12px rgba(0,0,0,0.8));
+  user-select: none;
+}
+
+/* Inner container — glow rings absolutely positioned relative to this */
+.wheel-canvas-container {
+  position: relative;
   width: 100%;
   max-width: 500px;
-  aspect-ratio: 1;
+}
+
+/* Canvas — fixed 500×500 buffer; CSS scales the display only */
+.wheel-canvas {
+  width: 100%;
+  height: auto;
   display: block;
   border-radius: 50%;
   position: relative;
   z-index: 2;
 }
 
-/* Glow rings (absolutely fill the canvas area) */
+/* Glow rings — inset outward from the canvas container edges */
 .wheel-glow-ring {
   position: absolute;
-  /* offset top accounts for the padding-top on .wheel-wrap */
-  top: calc(44px - var(--ring-extra, 0px));
-  left: 50%;
-  transform: translateX(-50%);
   border-radius: 50%;
   pointer-events: none;
   z-index: 1;
@@ -473,19 +488,13 @@
 }
 
 .wheel-glow-ring--outer {
-  --ring-extra: 12px;
-  width: calc(min(500px, 100%) + 24px);
-  height: calc(min(500px, 100%) + 24px);
-  top: calc(44px - 12px);
+  inset: -14px;
   border: 2px solid var(--border);
   box-shadow: var(--glow-green);
 }
 
 .wheel-glow-ring--inner {
-  --ring-extra: 4px;
-  width: calc(min(500px, 100%) + 8px);
-  height: calc(min(500px, 100%) + 8px);
-  top: calc(44px - 4px);
+  inset: -5px;
   border: 1px solid var(--neon-dim);
 }
 
@@ -495,19 +504,6 @@
 .wheel-glow-ring--active.wheel-glow-ring--outer {
   border-color: var(--neon);
   box-shadow: 0 0 40px rgba(0,255,127,0.55), 0 0 90px rgba(0,166,81,0.3);
-}
-
-/* Pointer sits in the top padding area, centered */
-.wheel-pointer {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 52px;
-  height: auto;
-  z-index: 10;
-  filter: drop-shadow(0 3px 10px rgba(0,0,0,0.7));
-  user-select: none;
 }
 
 /* ---- SpinButton ---- */
@@ -604,6 +600,16 @@
   letter-spacing: 0.04em;
 }
 
+/* Error recovery note shown when submit fails after spin */
+.wheel-error-note {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.82rem;
+  color: #f87171;
+  letter-spacing: 0.03em;
+}
+
 /* Empty / no-segments card */
 .wheel-empty {
   max-width: 380px;
@@ -636,28 +642,24 @@
 
 /* 1080×1920 portrait interactive screens */
 @media (min-width: 900px) and (min-height: 1400px) {
-  .wheel-wrap         { max-width: 700px; padding-top: 60px; }
-  .wheel-canvas       { max-width: 660px; }
-  .wheel-pointer      { width: 70px; }
-  .wheel-btn-wrap     { max-width: 500px; }
-  .spin-btn           { height: 76px; font-size: 1.2rem; border-radius: 20px; }
-  .wheel-page-title   { font-size: 5rem; }
-  .wheel-player-badge { font-size: 1rem; padding: 8px 24px; }
-  .wheel-glow-ring--outer { width: calc(min(660px, 100%) + 28px); height: calc(min(660px, 100%) + 28px); }
-  .wheel-glow-ring--inner { width: calc(min(660px, 100%) + 10px); height: calc(min(660px, 100%) + 10px); }
+  .wheel-wrap            { max-width: 720px; padding-top: 52px; }
+  .wheel-canvas-container{ max-width: 660px; }
+  .wheel-pointer         { width: 68px; }
+  .wheel-btn-wrap        { max-width: 500px; }
+  .spin-btn              { height: 76px; font-size: 1.2rem; border-radius: 20px; }
+  .wheel-page-title      { font-size: 5rem; }
+  .wheel-player-badge    { font-size: 1rem; padding: 8px 24px; }
 }
 
 /* Mobile */
 @media (max-width: 480px) {
-  .wheel-wrap         { max-width: 100%; padding-top: 36px; }
-  .wheel-canvas       { max-width: 340px; }
-  .wheel-pointer      { width: 40px; }
-  .wheel-btn-wrap     { max-width: 100%; }
-  .spin-btn           { height: 56px; font-size: 0.92rem; }
-  .wheel-content      { padding-top: 24px; padding-bottom: 36px; }
-  .wheel-page-title   { font-size: 2.2rem; margin-bottom: 24px; }
-  .wheel-glow-ring--outer { width: calc(min(340px, 100%) + 20px); height: calc(min(340px, 100%) + 20px); }
-  .wheel-glow-ring--inner { width: calc(min(340px, 100%) + 8px);  height: calc(min(340px, 100%) + 8px); }
+  .wheel-wrap            { max-width: 100%; padding-top: 28px; }
+  .wheel-canvas-container{ max-width: 340px; }
+  .wheel-pointer         { width: 38px; }
+  .wheel-btn-wrap        { max-width: 100%; }
+  .spin-btn              { height: 56px; font-size: 0.92rem; }
+  .wheel-content         { padding-top: 24px; padding-bottom: 36px; }
+  .wheel-page-title      { font-size: 2.2rem; margin-bottom: 24px; }
 }
 
 /* ==============================================

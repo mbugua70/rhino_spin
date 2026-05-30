@@ -2,10 +2,10 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
-import { User, AlertTriangle } from 'lucide-react'
+import { User, AlertTriangle, PhoneCall } from 'lucide-react'
 import PremiumWheel from '../components/spin/PremiumWheel'
 import SpinButton from '../components/spin/SpinButton'
-import { submitSpinResult } from '../api/spinApi'
+import { submitSpinResult, getPublicSegments } from '../api/spinApi'
 import '../styles/spin.css'
 
 function pickWinner(segments) {
@@ -18,37 +18,52 @@ function pickWinner(segments) {
 }
 
 export default function SpinWheelPage() {
-  const navigate    = useNavigate()
-  const spinFnRef   = useRef(null)   // set by PremiumWheel via onReady
-  const winnerRef   = useRef(null)   // winner held across async callback
-  const audioRef    = useRef(null)
+  const navigate  = useNavigate()
+  const spinFnRef = useRef(null)  // spin function provided by PremiumWheel via onReady
+  const winnerRef = useRef(null)  // winner held in ref so async callback always sees it
+  const audioRef  = useRef(null)
 
-  const [playerName, setPlayerName] = useState('')
-  const [segments,   setSegments]   = useState([])
-  const [spinStatus, setSpinStatus] = useState('idle')
+  const [playerName,    setPlayerName]    = useState('')
+  const [segments,      setSegments]      = useState([])
+  const [spinStatus,    setSpinStatus]    = useState('idle')
+  const [fetchingSegs,  setFetchingSegs]  = useState(true)
+  const [fetchError,    setFetchError]    = useState('')
 
-  // Read localStorage; redirect if session missing
+  // Always fetch live segments on mount — never trust localStorage for segments
   useEffect(() => {
-    const code    = localStorage.getItem('spin_player_code')
-    const name    = localStorage.getItem('spin_player_name')
-    const segsRaw = localStorage.getItem('spin_segments')
-
+    const code = localStorage.getItem('spin_player_code')
+    const name = localStorage.getItem('spin_player_name')
     if (!code) { navigate('/'); return }
 
     setPlayerName(name || 'Player')
 
-    try {
-      const parsed = JSON.parse(segsRaw || '[]')
-      const sorted = [...parsed].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
-      setSegments(sorted)
-    } catch {
-      setSegments([])
-    }
+    getPublicSegments()
+      .then((res) => {
+        const raw    = res.data?.segments ?? []
+        const sorted = [...raw]
+          .filter((s) => s.is_active)
+          .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+        setSegments(sorted)
+        setFetchingSegs(false)
+      })
+      .catch(() => {
+        setFetchError('Could not load prizes. Please check your connection and refresh.')
+        setFetchingSegs(false)
+      })
   }, [navigate])
 
-  // Called by Winwheel when animation fully stops
+  // Cleanup audio if user navigates away mid-spin
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause()
+        audioRef.current = null
+      }
+    }
+  }, [])
+
+  // Called by Winwheel when the animation fully stops
   const handleSpinFinished = useCallback(async () => {
-    // Fade out spin audio
     if (audioRef.current) {
       audioRef.current.pause()
       audioRef.current.currentTime = 0
@@ -69,11 +84,11 @@ export default function SpinWheelPage() {
     try {
       await submitSpinResult(playerCode, winner._id)
       setSpinStatus('completed')
-      // Brief pause so the CONGRATULATIONS button is visible, then go to result
-      setTimeout(() => navigate('/result', { state: { justWon: true } }), 1800)
+      // replace: true so back button cannot return to the wheel after winning
+      setTimeout(() => navigate('/result', { state: { justWon: true }, replace: true }), 1800)
     } catch (err) {
-      const msg = err.response?.data?.message || 'Failed to record result. Please contact event staff.'
-      toast.error(msg, { duration: 8000 })
+      const msg = err.response?.data?.message || 'Failed to record your result. Please contact event staff.'
+      toast.error(msg, { duration: 10000 })
       setSpinStatus('error')
     }
   }, [navigate])
@@ -81,7 +96,7 @@ export default function SpinWheelPage() {
   const handleSpin = () => {
     if (spinStatus !== 'idle' || !segments.length) return
     if (!spinFnRef.current) {
-      toast.error('Wheel not ready yet. Please wait a moment.')
+      toast.error('Wheel is not ready yet. Please wait a moment and try again.')
       return
     }
 
@@ -92,11 +107,10 @@ export default function SpinWheelPage() {
     }
     winnerRef.current = winner
 
-    // Start spin audio
     try {
       const audio = new Audio('/audio/audio_one.mp3')
       audio.loop  = true
-      audio.play().catch(() => {})
+      audio.play().catch(() => {}) // autoplay may be blocked; fail silently
       audioRef.current = audio
     } catch {}
 
@@ -106,7 +120,7 @@ export default function SpinWheelPage() {
     spinFnRef.current(winnerIndex1)
   }
 
-  const isEmpty = segments.length === 0
+  const isEmpty = !fetchingSegs && segments.length === 0 && !fetchError
 
   return (
     <div className="spin-page">
@@ -115,7 +129,7 @@ export default function SpinWheelPage() {
 
       <div className="spin-page__content wheel-content">
 
-        {/* Player badge */}
+        {/* Player name badge */}
         <motion.div
           className="wheel-player-badge"
           initial={{ opacity: 0, y: -12 }}
@@ -136,7 +150,36 @@ export default function SpinWheelPage() {
           SPIN &amp; WIN
         </motion.h1>
 
-        {/* Empty / no-segments state */}
+        {/* Loading segments */}
+        {fetchingSegs && (
+          <motion.div className="result-loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <div className="spin-ring" />
+            <p style={{ color: 'var(--text-muted)', marginTop: 16, fontSize: '0.9rem' }}>
+              Loading prizes&hellip;
+            </p>
+          </motion.div>
+        )}
+
+        {/* Fetch error */}
+        {fetchError && (
+          <motion.div
+            className="wheel-empty spin-card"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+          >
+            <AlertTriangle size={32} color="#f87171" style={{ margin: '0 auto 16px' }} />
+            <p style={{ color: 'var(--text-secondary)', marginBottom: 8 }}>{fetchError}</p>
+            <button
+              className="result-retry-btn"
+              style={{ marginTop: 8 }}
+              onClick={() => window.location.reload()}
+            >
+              Refresh
+            </button>
+          </motion.div>
+        )}
+
+        {/* No-segments state */}
         <AnimatePresence>
           {isEmpty && (
             <motion.div
@@ -147,7 +190,7 @@ export default function SpinWheelPage() {
             >
               <AlertTriangle size={32} color="var(--neon)" style={{ margin: '0 auto 16px' }} />
               <p style={{ color: 'var(--text-secondary)', marginBottom: 8 }}>
-                No prizes available right now.
+                No prizes are available right now.
               </p>
               <p className="text-muted" style={{ fontSize: '0.85rem' }}>
                 Please contact event staff for assistance.
@@ -156,8 +199,8 @@ export default function SpinWheelPage() {
           )}
         </AnimatePresence>
 
-        {/* Wheel + spin button */}
-        {!isEmpty && (
+        {/* Wheel + spin controls */}
+        {!fetchingSegs && !fetchError && !isEmpty && (
           <motion.div
             className="wheel-stage"
             initial={{ opacity: 0, scale: 0.88 }}
@@ -176,31 +219,29 @@ export default function SpinWheelPage() {
 
               <AnimatePresence mode="wait">
                 {spinStatus === 'idle' && (
-                  <motion.p
-                    key="hint-idle"
-                    className="wheel-hint"
-                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                  >
+                  <motion.p key="idle" className="wheel-hint"
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                     Tap to spin the wheel
                   </motion.p>
                 )}
                 {spinStatus === 'submitting' && (
-                  <motion.p
-                    key="hint-sub"
-                    className="wheel-hint"
-                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                  >
+                  <motion.p key="sub" className="wheel-hint"
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                     Recording your result&hellip;
                   </motion.p>
                 )}
                 {spinStatus === 'completed' && (
-                  <motion.p
-                    key="hint-done"
-                    className="wheel-hint text-neon"
-                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                  >
+                  <motion.p key="done" className="wheel-hint text-neon"
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                     Taking you to your prize&hellip;
                   </motion.p>
+                )}
+                {spinStatus === 'error' && (
+                  <motion.div key="err" className="wheel-error-note"
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                    <PhoneCall size={14} />
+                    Please show this screen to event staff
+                  </motion.div>
                 )}
               </AnimatePresence>
             </div>
