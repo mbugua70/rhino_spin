@@ -1,8 +1,6 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 
-// Winwheel.js (loaded via public/Winwheel.js) calls window.TweenMax internally.
-// GSAP 3 is API-compatible with TweenMax for the subset Winwheel uses.
 if (typeof window !== 'undefined') window.TweenMax = gsap
 
 const FALLBACK_COLORS = [
@@ -11,28 +9,26 @@ const FALLBACK_COLORS = [
   '#006633', '#3ddc84', '#00b359', '#008040',
 ]
 
-export default function PremiumWheel({ segments, onFinished, isSpinning, onReady }) {
-  const wheelRef      = useRef(null)
-  const onFinishedRef = useRef(onFinished)
+export default function PremiumWheel({ segments, onFinished, isSpinning, onReady, onFrame }) {
+  const wheelRef       = useRef(null)
+  const onFinishedRef  = useRef(onFinished)
+  const onFrameRef     = useRef(onFrame)
 
-  // Keep the callback current without recreating the wheel
   useEffect(() => { onFinishedRef.current = onFinished }, [onFinished])
+  useEffect(() => { onFrameRef.current    = onFrame    }, [onFrame])
 
   useEffect(() => {
     if (!segments?.length) return
     if (!window.Winwheel) {
-      console.error('Winwheel not found on window — check public/Winwheel.js is loading')
+      console.error('Winwheel not found — check public/Winwheel.js')
       return
     }
 
-    // Destroy previous instance cleanly
     if (wheelRef.current) {
       try { wheelRef.current.stopAnimation(false) } catch {}
       wheelRef.current = null
     }
 
-    // Center alignment keeps text in the middle of each segment's radius
-    // so long labels can't overflow the outer rim or the center hub
     const fontSize = Math.max(10, Math.min(15, Math.floor(220 / segments.length)))
 
     const winSegs = segments.map((s, i) => ({
@@ -49,10 +45,13 @@ export default function PremiumWheel({ segments, onFinished, isSpinning, onReady
       numSegments: segments.length,
       segments:    winSegs,
       animation: {
-        type:             'spinToStop',
-        duration:         6,
-        spins:            8,
-        easing:           'Power4.easeOut',
+        type:     'spinToStop',
+        duration: 10,   // matched to audio length (~10 s)
+        spins:    8,
+        easing:   'Power4.easeOut',
+        // callbackAfter fires every animation frame — first call starts audio,
+        // subsequent calls are no-ops (browser ignores play() on already-playing audio)
+        callbackAfter:    () => onFrameRef.current?.(),
         callbackFinished: () => onFinishedRef.current?.(),
       },
       lineWidth:       2,
@@ -61,7 +60,6 @@ export default function PremiumWheel({ segments, onFinished, isSpinning, onReady
       textAlignment:   'center',
     })
 
-    // Hand a spin function to the parent — avoids forwardRef complexity
     onReady?.((winnerIndex1Based) => {
       if (!wheelRef.current) return
       const stopAt = wheelRef.current.getRandomForSegment(winnerIndex1Based)
@@ -79,22 +77,11 @@ export default function PremiumWheel({ segments, onFinished, isSpinning, onReady
 
   return (
     <div className="wheel-wrap">
-      {/* Pointer sits at 12 o'clock, tip pointing into the wheel */}
-      <img
-        src="/basic_pointer.png"
-        className="wheel-pointer"
-        alt="Win pointer"
-        draggable={false}
-      />
-
-      {/* Dark outer ring */}
+      <img src="/basic_pointer.png" className="wheel-pointer" alt="Win pointer" draggable={false} />
       <div className={`wheel-outer-ring${isSpinning ? ' wheel-outer-ring--spinning' : ''}`}>
-        {/* Gold accent ring */}
         <div className="wheel-gold-ring">
-          {/* Canvas container */}
           <div className="wheel-canvas-container">
             <canvas id="spin-canvas" width={500} height={500} className="wheel-canvas" />
-            {/* Center hub */}
             <div className="wheel-center-hub" />
           </div>
         </div>

@@ -106,11 +106,12 @@ export default function SpinWheelPage() {
 
     try {
       const audio = new Audio('/audio/audio_one.mp3')
-      audio.loop = false  // play once — the track ends with the win reveal sound
-      audio.play().catch(() => {})
-      audioRef.current = audio
-      // Clear ref when audio finishes naturally so unmount cleanup knows
+      audio.loop = false
       audio.addEventListener('ended', () => { audioRef.current = null }, { once: true })
+      audioRef.current = audio
+      // Do NOT call audio.play() here — it is triggered by PremiumWheel's
+      // callbackAfter on the first animation frame so audio and wheel are
+      // frame-perfectly in sync
     } catch {}
 
     setSpinStatus('spinning')
@@ -211,6 +212,12 @@ export default function SpinWheelPage() {
               onFinished={handleSpinFinished}
               isSpinning={spinStatus === 'spinning'}
               onReady={(fn) => { spinFnRef.current = fn }}
+              onFrame={() => {
+                // First call starts the audio; browser ignores play() once already playing
+                if (audioRef.current?.paused) {
+                  audioRef.current.play().catch(() => {})
+                }
+              }}
             />
 
             <div className="wheel-btn-wrap">
