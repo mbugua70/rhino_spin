@@ -64,11 +64,8 @@ export default function SpinWheelPage() {
 
   // Called by Winwheel when the animation fully stops
   const handleSpinFinished = useCallback(async () => {
-    if (audioRef.current) {
-      audioRef.current.pause()
-      audioRef.current.currentTime = 0
-      audioRef.current = null
-    }
+    // Do NOT stop the audio here — the track's ending contains the win reveal
+    // sound that should play as the wheel comes to a stop. It will end naturally.
 
     setSpinStatus('submitting')
 
@@ -109,9 +106,11 @@ export default function SpinWheelPage() {
 
     try {
       const audio = new Audio('/audio/audio_one.mp3')
-      audio.loop  = true
-      audio.play().catch(() => {}) // autoplay may be blocked; fail silently
+      audio.loop = false  // play once — the track ends with the win reveal sound
+      audio.play().catch(() => {})
       audioRef.current = audio
+      // Clear ref when audio finishes naturally so unmount cleanup knows
+      audio.addEventListener('ended', () => { audioRef.current = null }, { once: true })
     } catch {}
 
     setSpinStatus('spinning')
