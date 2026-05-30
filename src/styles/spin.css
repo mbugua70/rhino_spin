@@ -721,7 +721,7 @@
 
 .result-headline {
   font-family: var(--font-heading);
-  font-size: clamp(1.1rem, 5vw, 3.8rem);
+  font-size: clamp(1rem, 4vw, 2rem);
   font-weight: 900;
   letter-spacing: 0.02em;
   color: var(--text);
