@@ -438,72 +438,106 @@
 
 /* ---- PremiumWheel wrapper ---- */
 /* Outer wrapper — position:relative so pointer can be absolute */
+/* Outer wrap — pointer is absolute inside here */
 .wheel-wrap {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 540px;
-  padding-top: 36px; /* space for pointer that sits above the canvas */
+  max-width: 560px;
+  padding-top: 32px;
 }
 
-/* Pointer — absolutely pinned to top-centre of wrap, tip points into wheel */
+/* Gold "WIN" pointer — floats above the outer ring at 12 o'clock */
 .wheel-pointer {
   position: absolute;
   top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 52px;
+  width: 54px;
   height: auto;
-  z-index: 10;
-  filter: drop-shadow(0 3px 12px rgba(0,0,0,0.8));
+  z-index: 20;
+  filter: drop-shadow(0 3px 14px rgba(0,0,0,0.9));
   user-select: none;
 }
 
-/* Inner container — glow rings absolutely positioned relative to this */
+/* ── Ring 1: thick dark outer ring ── */
+.wheel-outer-ring {
+  width: 100%;
+  max-width: 520px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  padding: 16px;
+  background: radial-gradient(circle at 30% 30%, #163d20, #0a2010 60%, #061208);
+  box-shadow:
+    0 0 0 2px rgba(0,255,127,0.12),
+    0 30px 90px rgba(0,0,0,0.75),
+    0 0 70px rgba(0,166,81,0.18),
+    inset 0 2px 6px rgba(255,255,255,0.07),
+    inset 0 -4px 12px rgba(0,0,0,0.5);
+  transition: box-shadow 0.4s;
+}
+
+.wheel-outer-ring--spinning {
+  box-shadow:
+    0 0 0 2px rgba(0,255,127,0.4),
+    0 30px 90px rgba(0,0,0,0.75),
+    0 0 90px rgba(0,255,127,0.35),
+    inset 0 2px 6px rgba(255,255,255,0.07),
+    inset 0 -4px 12px rgba(0,0,0,0.5);
+  animation: neon-pulse 1s ease-in-out infinite;
+}
+
+/* ── Ring 2: thin gold accent ring ── */
+.wheel-gold-ring {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  padding: 5px;
+  background: conic-gradient(
+    from 0deg,
+    #fbbf24, #f59e0b, #d97706, #f59e0b, #fbbf24,
+    #f59e0b, #d97706, #f59e0b, #fbbf24
+  );
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.4);
+}
+
+/* ── Canvas container ── */
 .wheel-canvas-container {
   position: relative;
   width: 100%;
-  max-width: 500px;
+  height: 100%;
+  border-radius: 50%;
+  background: #050d07;
+  overflow: hidden;
 }
 
-/* Canvas — fixed 500×500 buffer; CSS scales the display only */
+/* Canvas — 500×500 buffer, CSS scales display */
 .wheel-canvas {
   width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
-  border-radius: 50%;
-  position: relative;
-  z-index: 2;
 }
 
-/* Glow rings — inset outward from the canvas container edges */
-.wheel-glow-ring {
+/* ── Center hub (like the reference image) ── */
+.wheel-center-hub {
   position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 7%;
+  height: 7%;
+  min-width: 24px;
+  min-height: 24px;
   border-radius: 50%;
-  pointer-events: none;
-  z-index: 1;
-  transition: box-shadow 0.35s, border-color 0.35s;
-}
-
-.wheel-glow-ring--outer {
-  inset: -14px;
-  border: 2px solid var(--border);
-  box-shadow: var(--glow-green);
-}
-
-.wheel-glow-ring--inner {
-  inset: -5px;
-  border: 1px solid var(--neon-dim);
-}
-
-.wheel-glow-ring--active {
-  animation: neon-pulse 0.9s ease-in-out infinite;
-}
-.wheel-glow-ring--active.wheel-glow-ring--outer {
-  border-color: var(--neon);
-  box-shadow: 0 0 40px rgba(0,255,127,0.55), 0 0 90px rgba(0,166,81,0.3);
+  background: radial-gradient(circle at 35% 35%, #1a5c28, #050d07);
+  border: 3px solid #f59e0b;
+  box-shadow:
+    0 0 16px rgba(0,0,0,0.9),
+    0 0 8px rgba(245,158,11,0.5),
+    inset 0 1px 2px rgba(255,255,255,0.15);
+  z-index: 5;
 }
 
 /* ---- SpinButton ---- */
@@ -642,9 +676,9 @@
 
 /* 1080×1920 portrait interactive screens */
 @media (min-width: 900px) and (min-height: 1400px) {
-  .wheel-wrap            { max-width: 720px; padding-top: 52px; }
-  .wheel-canvas-container{ max-width: 660px; }
-  .wheel-pointer         { width: 68px; }
+  .wheel-wrap            { max-width: 760px; padding-top: 52px; }
+  .wheel-outer-ring      { max-width: 700px; padding: 22px; }
+  .wheel-pointer         { width: 72px; }
   .wheel-btn-wrap        { max-width: 500px; }
   .spin-btn              { height: 76px; font-size: 1.2rem; border-radius: 20px; }
   .wheel-page-title      { font-size: 5rem; }
@@ -653,9 +687,10 @@
 
 /* Mobile */
 @media (max-width: 480px) {
-  .wheel-wrap            { max-width: 100%; padding-top: 28px; }
-  .wheel-canvas-container{ max-width: 340px; }
-  .wheel-pointer         { width: 38px; }
+  .wheel-wrap            { max-width: 100%; padding-top: 26px; }
+  .wheel-outer-ring      { max-width: 340px; padding: 12px; }
+  .wheel-gold-ring       { padding: 3px; }
+  .wheel-pointer         { width: 40px; }
   .wheel-btn-wrap        { max-width: 100%; }
   .spin-btn              { height: 56px; font-size: 0.92rem; }
   .wheel-content         { padding-top: 24px; padding-bottom: 36px; }

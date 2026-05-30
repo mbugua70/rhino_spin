@@ -76,7 +76,7 @@ export default function PremiumWheel({ segments, onFinished, isSpinning, onReady
 
   return (
     <div className="wheel-wrap">
-      {/* Pointer sits above the canvas; negative margin pulls canvas up under the tip */}
+      {/* Pointer sits at 12 o'clock, tip pointing into the wheel */}
       <img
         src="/basic_pointer.png"
         className="wheel-pointer"
@@ -84,11 +84,17 @@ export default function PremiumWheel({ segments, onFinished, isSpinning, onReady
         draggable={false}
       />
 
-      {/* Canvas container — glow rings are absolutely positioned inside here */}
-      <div className="wheel-canvas-container">
-        <div className={`wheel-glow-ring wheel-glow-ring--outer${isSpinning ? ' wheel-glow-ring--active' : ''}`} />
-        <div className={`wheel-glow-ring wheel-glow-ring--inner${isSpinning ? ' wheel-glow-ring--active' : ''}`} />
-        <canvas id="spin-canvas" width={500} height={500} className="wheel-canvas" />
+      {/* Dark outer ring */}
+      <div className={`wheel-outer-ring${isSpinning ? ' wheel-outer-ring--spinning' : ''}`}>
+        {/* Gold accent ring */}
+        <div className="wheel-gold-ring">
+          {/* Canvas container */}
+          <div className="wheel-canvas-container">
+            <canvas id="spin-canvas" width={500} height={500} className="wheel-canvas" />
+            {/* Center hub */}
+            <div className="wheel-center-hub" />
+          </div>
+        </div>
       </div>
     </div>
   )
