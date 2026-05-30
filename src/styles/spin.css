@@ -721,11 +721,14 @@
 
 .result-headline {
   font-family: var(--font-heading);
-  font-size: clamp(2rem, 7vw, 3.8rem);
+  font-size: clamp(1.1rem, 5vw, 3.8rem);
   font-weight: 900;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   color: var(--text);
   text-shadow: 0 0 50px rgba(0,255,127,0.2);
+  word-break: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
 }
 
 /* Loading */
