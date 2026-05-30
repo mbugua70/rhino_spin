@@ -31,7 +31,9 @@ export default function PremiumWheel({ segments, onFinished, isSpinning, onReady
       wheelRef.current = null
     }
 
-    const fontSize = Math.max(13, Math.min(22, Math.floor(280 / segments.length)))
+    // Center alignment keeps text in the middle of each segment's radius
+    // so long labels can't overflow the outer rim or the center hub
+    const fontSize = Math.max(10, Math.min(15, Math.floor(220 / segments.length)))
 
     const winSegs = segments.map((s, i) => ({
       fillStyle:     s.fillStyle     || FALLBACK_COLORS[i % FALLBACK_COLORS.length],
@@ -39,7 +41,7 @@ export default function PremiumWheel({ segments, onFinished, isSpinning, onReady
       strokeStyle:   s.strokeStyle   || 'rgba(255,255,255,0.6)',
       textFillStyle: s.textFillStyle || '#ffffff',
       textFontSize:  fontSize,
-      textAlignment: 'outer',
+      textAlignment: 'center',
     }))
 
     wheelRef.current = new window.Winwheel({
@@ -55,7 +57,8 @@ export default function PremiumWheel({ segments, onFinished, isSpinning, onReady
       },
       lineWidth:       2,
       strokeStyle:     'rgba(0,255,127,0.35)',
-      textOrientation: 'curved',
+      textOrientation: 'vertical',
+      textAlignment:   'center',
     })
 
     // Hand a spin function to the parent — avoids forwardRef complexity
