@@ -10,9 +10,9 @@ import '../styles/spin.css'
 
 function pickWinner(segments) {
   const winnable = segments.filter(
-    (s) => s.is_active && s.is_winnable && (s.quantity == null || s.quantity > 0)
+    (s) => s.is_active && s.is_winnable && s.quantity > 0
   )
-  const pool = winnable.length ? winnable : segments.filter((s) => s.is_active)
+  const pool = winnable.length ? winnable : segments.filter((s) => s.is_active && s.quantity > 0)
   if (!pool.length) return null
   return pool[Math.floor(Math.random() * pool.length)]
 }
@@ -41,7 +41,7 @@ export default function SpinWheelPage() {
       .then((res) => {
         const raw    = res.data?.segments ?? []
         const sorted = [...raw]
-          .filter((s) => s.is_active)
+          .filter((s) => s.is_active && s.quantity > 0)
           .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
         setSegments(sorted)
         setFetchingSegs(false)
