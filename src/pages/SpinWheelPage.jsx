@@ -70,7 +70,7 @@ export default function SpinWheelPage() {
       await submitSpinResult(playerCode, winner._id)
       setSpinStatus('completed')
       // Brief pause so the CONGRATULATIONS button is visible, then go to result
-      setTimeout(() => navigate('/result'), 1800)
+      setTimeout(() => navigate('/result', { state: { justWon: true } }), 1800)
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to record result. Please contact event staff.'
       toast.error(msg, { duration: 8000 })

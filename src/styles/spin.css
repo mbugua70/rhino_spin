@@ -659,3 +659,218 @@
   .wheel-glow-ring--outer { width: calc(min(340px, 100%) + 20px); height: calc(min(340px, 100%) + 20px); }
   .wheel-glow-ring--inner { width: calc(min(340px, 100%) + 8px);  height: calc(min(340px, 100%) + 8px); }
 }
+
+/* ==============================================
+   Step 4: Result Page
+   ============================================== */
+
+.result-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-top: 48px;
+  padding-bottom: 56px;
+  gap: 28px;
+}
+
+/* Top header (badge + headline) */
+.result-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.result-headline {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 7vw, 3.8rem);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  text-shadow: 0 0 50px rgba(0,255,127,0.2);
+}
+
+/* Loading */
+.result-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 280px;
+}
+
+/* Error card */
+.result-error {
+  max-width: 400px;
+  text-align: center;
+}
+
+.result-retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--grad-green);
+  border-radius: 10px;
+  padding: 11px 28px;
+  font-family: var(--font-heading);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: #fff;
+  transition: box-shadow 0.2s;
+  box-shadow: var(--glow-btn);
+  cursor: pointer;
+  border: none;
+}
+.result-retry-btn:hover { box-shadow: 0 6px 28px rgba(0,166,81,0.65); }
+
+/* ==============================================
+   PrizeResultModal (PrizeResultModal.jsx)
+   ============================================== */
+
+.prize-modal {
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+}
+
+/* Trophy icon circle */
+.prize-trophy {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: rgba(0, 255, 127, 0.07);
+  border: 1.5px solid var(--border);
+  box-shadow: var(--glow-green), inset 0 0 20px rgba(0,255,127,0.05);
+  margin: 0 auto 20px;
+}
+
+/* Card sub-headline */
+.prize-headline {
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+
+/* The prize name — centrepiece */
+.prize-name {
+  font-family: var(--font-heading);
+  font-size: clamp(1.6rem, 5vw, 2.6rem);
+  font-weight: 900;
+  color: var(--neon);
+  text-shadow: 0 0 20px rgba(0,255,127,0.5), 0 0 60px rgba(0,166,81,0.25);
+  line-height: 1.2;
+  margin-bottom: 24px;
+  letter-spacing: 0.03em;
+  word-break: break-word;
+}
+
+/* Player + date rows */
+.prize-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 20px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.prize-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+.prize-meta-row svg { color: var(--neon); flex-shrink: 0; }
+
+/* Snapshot detail block */
+.prize-snapshot {
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.prize-snapshot-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.73rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+.prize-snapshot-header svg { color: var(--neon); }
+
+.prize-snapshot-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 0.85rem;
+}
+.prize-snapshot-row:last-child { border-bottom: none; padding-bottom: 0; }
+
+.prize-snapshot-key {
+  color: var(--text-muted);
+  text-transform: capitalize;
+  flex-shrink: 0;
+}
+.prize-snapshot-val {
+  color: var(--text);
+  font-weight: 500;
+  text-align: right;
+  word-break: break-word;
+}
+
+/* Claim instruction */
+.prize-staff-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  padding: 12px 16px;
+  background: var(--neon-subtle);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-top: 4px;
+}
+
+/* ==============================================
+   Responsive — Result page
+   ============================================== */
+
+/* 1080×1920 portrait */
+@media (min-width: 900px) and (min-height: 1400px) {
+  .prize-modal     { max-width: 580px; }
+  .prize-name      { font-size: 3.2rem; }
+  .prize-headline  { font-size: 1.7rem; }
+  .prize-trophy    { width: 110px; height: 110px; }
+  .result-headline { font-size: 4.8rem; }
+  .result-content  { padding-top: 64px; }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .result-content  { padding-top: 24px; padding-bottom: 36px; gap: 20px; }
+  .prize-name      { font-size: 1.6rem; }
+  .prize-headline  { font-size: 1.15rem; }
+  .result-headline { font-size: 2rem; }
+  .prize-trophy    { width: 72px; height: 72px; }
+}
