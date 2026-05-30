@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import Confetti from 'react-confetti'
-import { AlertTriangle, RefreshCcw } from 'lucide-react'
+import { AlertTriangle, RefreshCcw, LogOut } from 'lucide-react'
 import PrizeResultModal from '../components/spin/PrizeResultModal'
 import { getSpinResult } from '../api/spinApi'
 import '../styles/spin.css'
@@ -21,6 +21,13 @@ export default function SpinResultPage() {
   const [spin,         setSpin]         = useState(null)
   const [errorMsg,     setErrorMsg]     = useState('')
   const [showConfetti, setShowConfetti] = useState(justWon)
+
+  const handleNewPlayer = () => {
+    localStorage.removeItem('spin_player_code')
+    localStorage.removeItem('spin_player_name')
+    localStorage.removeItem('spin_segments')
+    navigate('/', { replace: true })
+  }
 
   const fetchResult = (playerCode) =>
     getSpinResult(playerCode)
@@ -124,6 +131,20 @@ export default function SpinResultPage() {
 
               {/* Prize card */}
               <PrizeResultModal spin={spin} justWon={justWon} />
+
+              {/* Next player */}
+              <motion.button
+                className="new-player-btn"
+                onClick={handleNewPlayer}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.9 }}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                <LogOut size={16} />
+                Next Player
+              </motion.button>
             </>
           )}
         </AnimatePresence>

@@ -13,10 +13,19 @@ function formatDate(dateStr) {
   }
 }
 
+const HIDDEN_KEYS = new Set([
+  'fillStyle', 'strokeStyle', 'textFillStyle', 'textFontSize',
+  'gift_number', 'sort_order', 'is_active', 'is_winnable',
+  'createdAt', 'updatedAt', '_id', '__v',
+])
+
 function getSnapshotEntries(snapshot) {
   if (!snapshot || typeof snapshot !== 'object') return []
   return Object.entries(snapshot).filter(
-    ([, v]) => v !== null && v !== undefined && typeof v !== 'object' && typeof v !== 'boolean'
+    ([k, v]) =>
+      !HIDDEN_KEYS.has(k) &&
+      v !== null && v !== undefined &&
+      typeof v !== 'object' && typeof v !== 'boolean'
   )
 }
 
@@ -105,15 +114,6 @@ export default function PrizeResultModal({ spin, justWon = false }) {
         </motion.div>
       )}
 
-      {/* Claim instruction */}
-      <motion.p
-        className="prize-staff-note"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.75 }}
-      >
-        Present this screen to event staff to claim your prize
-      </motion.p>
     </motion.div>
   )
 }
