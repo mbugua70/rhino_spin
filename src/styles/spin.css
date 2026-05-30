@@ -104,3 +104,284 @@
   0%, 100% { box-shadow: var(--glow-green); }
   50%       { box-shadow: 0 0 40px rgba(0,255,127,0.5), 0 0 80px rgba(0,166,81,0.25); }
 }
+
+/* ==============================================
+   Step 2: Landing Page
+   ============================================== */
+
+/* Decorative neon rings (background) */
+.landing-rings {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.landing-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+}
+
+.landing-ring--1 {
+  width: 520px; height: 520px;
+  animation: neon-pulse 4s ease-in-out infinite;
+}
+.landing-ring--2 {
+  width: 800px; height: 800px;
+  border-color: var(--neon-glow);
+  animation: neon-pulse 4s ease-in-out infinite 1.3s;
+}
+.landing-ring--3 {
+  width: 1080px; height: 1080px;
+  border-color: rgba(0,255,127,0.04);
+  animation: neon-pulse 4s ease-in-out infinite 2.6s;
+}
+
+/* Safaricom × Rhino badge */
+.landing-saf-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 6px 18px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  margin-bottom: 28px;
+}
+
+.landing-saf-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--saf-green);
+  box-shadow: 0 0 10px var(--saf-green);
+  flex-shrink: 0;
+}
+
+/* Page content column */
+.landing-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-top: 48px;
+  padding-bottom: 48px;
+}
+
+/* Headline */
+.landing-header { margin-bottom: 36px; }
+
+.landing-title {
+  font-family: var(--font-heading);
+  font-size: clamp(3.2rem, 10vw, 6.5rem);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  text-shadow: 0 0 60px rgba(0,255,127,0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.landing-title__year {
+  color: var(--neon);
+  font-size: clamp(2rem, 7vw, 4.8rem);
+  text-shadow: 0 0 30px rgba(0,255,127,0.5), 0 0 80px rgba(0,166,81,0.25);
+}
+
+.landing-tagline {
+  font-size: clamp(0.82rem, 2vw, 1rem);
+  color: var(--text-muted);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  margin-top: 16px;
+}
+
+/* Card */
+.landing-card {
+  width: 100%;
+  max-width: 460px;
+  text-align: center;
+}
+
+.landing-card__title {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
+.landing-card__subtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin-bottom: 28px;
+}
+
+/* Footer note */
+.landing-footer-note {
+  margin-top: 22px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+/* ==============================================
+   Player Code Form (PlayerCodeForm.jsx)
+   ============================================== */
+
+.pcf {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  text-align: left;
+}
+
+.pcf__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pcf__label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.pcf__input {
+  width: 100%;
+  height: 58px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1.5px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 0 20px;
+  font-size: 1.35rem;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  -webkit-appearance: none;
+  display: block;
+}
+
+.pcf__input::placeholder {
+  color: var(--text-muted);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  font-size: 1rem;
+  font-family: var(--font-sans);
+}
+
+.pcf__input:focus {
+  border-color: var(--neon);
+  background: rgba(0, 255, 127, 0.04);
+  box-shadow: 0 0 0 3px rgba(0, 255, 127, 0.12), 0 0 20px rgba(0,255,127,0.1);
+}
+
+.pcf__input--error {
+  border-color: #f87171 !important;
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.15) !important;
+}
+
+.pcf__input:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.pcf__error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: #f87171;
+  padding: 2px 2px 0;
+  overflow: hidden;
+}
+
+.pcf__btn {
+  width: 100%;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--grad-green);
+  border-radius: 12px;
+  font-family: var(--font-heading);
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #fff;
+  transition: box-shadow 0.25s, background 0.25s, opacity 0.2s;
+  box-shadow: var(--glow-btn);
+}
+
+.pcf__btn:hover:not(:disabled) {
+  background: var(--grad-green-hover);
+  box-shadow: 0 6px 36px rgba(0,166,81,0.7), 0 0 0 1px rgba(0,255,127,0.35);
+}
+
+.pcf__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+@keyframes pcf-spin {
+  to { transform: rotate(360deg); }
+}
+
+.pcf__spinner { animation: pcf-spin 0.85s linear infinite; }
+
+/* ==============================================
+   Responsive overrides
+   ============================================== */
+
+/* 1080×1920 portrait interactive screens */
+@media (min-width: 900px) and (min-height: 1400px) {
+  .landing-title       { font-size: 8rem; }
+  .landing-title__year { font-size: 6rem; }
+  .landing-card        { max-width: 580px; }
+  .spin-card           { padding: 56px 52px; border-radius: 32px; }
+  .pcf__input,
+  .pcf__btn            { height: 68px; font-size: 1.15rem; }
+  .landing-card__title { font-size: 1.7rem; }
+  .landing-saf-badge   { font-size: 13px; padding: 8px 22px; }
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  .landing-content { padding-top: 32px; padding-bottom: 32px; }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .landing-title       { font-size: 3rem; }
+  .landing-title__year { font-size: 2.1rem; }
+  .landing-content     { padding-top: 20px; padding-bottom: 24px; }
+  .landing-ring--3     { display: none; }
+  .landing-ring--2     { width: 520px; height: 520px; }
+  .landing-ring--1     { width: 320px; height: 320px; }
+}
