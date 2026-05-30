@@ -1,0 +1,106 @@
+/* =============================================
+   Spin Game — Shared Layout Styles
+   Built up across Steps 2-5
+   ============================================= */
+
+/* ---- Full-screen page shell ---- */
+.spin-page {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--grad-bg);
+}
+
+/* Rhino pattern overlay */
+.spin-page__bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('/pattern1.jpeg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.07;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Top edge: rally truck banner */
+.spin-page__banner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 140px;
+  background-image: url('/bg1.jpeg');
+  background-size: cover;
+  background-position: center 40%;
+  opacity: 0.18;
+  pointer-events: none;
+  z-index: 0;
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
+}
+
+.spin-page__content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 20px;
+}
+
+/* ---- Glassmorphism card ---- */
+.spin-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  box-shadow: var(--shadow-card);
+  padding: 40px;
+}
+
+@media (max-width: 480px) {
+  .spin-card { padding: 28px 20px; border-radius: 20px; }
+}
+
+/* ---- Neon glow divider ---- */
+.spin-divider {
+  width: 60px;
+  height: 2px;
+  background: var(--grad-neon);
+  border-radius: 2px;
+  margin: 0 auto 24px;
+  box-shadow: var(--glow-green);
+}
+
+/* ---- Utility: neon text ---- */
+.text-neon    { color: var(--neon); }
+.text-green   { color: var(--saf-green); }
+.text-muted   { color: var(--text-muted); }
+.text-heading { font-family: var(--font-heading); }
+
+/* ---- Loading spinner ---- */
+@keyframes spin-ring {
+  to { transform: rotate(360deg); }
+}
+
+.spin-ring {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--neon);
+  border-radius: 50%;
+  animation: spin-ring 0.75s linear infinite;
+}
+
+/* ---- Neon pulse animation ---- */
+@keyframes neon-pulse {
+  0%, 100% { box-shadow: var(--glow-green); }
+  50%       { box-shadow: 0 0 40px rgba(0,255,127,0.5), 0 0 80px rgba(0,166,81,0.25); }
+}
